@@ -32,9 +32,7 @@ public class MapFragment extends SupportMapFragment implements
     private static final String TAG = MapFragment.class.getSimpleName();
 
     public static MapFragment newInstance() {
-        MapFragment mapFragment = new MapFragment();
-
-        return mapFragment;
+        return new MapFragment();
     }
 
     @Override

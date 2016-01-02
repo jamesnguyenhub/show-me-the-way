@@ -25,6 +25,11 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
 
     private List<PlaceModel> placeModelList;
     private LayoutInflater layoutInflater;
+    private OnPlaceItemClickedListener onPlaceItemClickedListener;
+
+    public interface OnPlaceItemClickedListener {
+        void onPlaceItemClicked(PlaceModel placeModel);
+    }
 
     public PlacesAdapter(Context context, Collection<PlaceModel> placeModelCollection) {
         placeModelList = (List<PlaceModel>)placeModelCollection;
@@ -41,6 +46,15 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         final PlaceModel placeModel = placeModelList.get(position);
 
         holder.tvDescription.setText(placeModel.getDescription());
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PlacesAdapter.this.onPlaceItemClickedListener != null) {
+                    PlacesAdapter.this.onPlaceItemClickedListener.onPlaceItemClicked(placeModel);
+                }
+            }
+        });
     }
 
     @Override
@@ -51,6 +65,11 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     public void setPlaceModelList(Collection<PlaceModel> placeModelCollection) {
         this.placeModelList = (List<PlaceModel>)placeModelCollection;
         this.notifyDataSetChanged();
+    }
+
+    public void setOnPlaceItemClickedListener(
+            OnPlaceItemClickedListener onPlaceItemClickedListener) {
+        this.onPlaceItemClickedListener = onPlaceItemClickedListener;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

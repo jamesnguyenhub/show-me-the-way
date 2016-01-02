@@ -36,7 +36,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white"
-        android:visibility="gone"
         >
 
         <EditText
@@ -46,13 +45,6 @@
             android:inputType="text"
             android:hint="@string/hint_search"
             android:focusable="false"
-            />
-
-        <Button
-            android:id="@+id/bt_temp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="temp"
             />
 
         <android.support.v7.widget.RecyclerView

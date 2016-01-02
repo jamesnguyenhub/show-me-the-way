@@ -1,22 +1,26 @@
 package com.tuyenmonkey.showmetheway.data.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by tuyen on 1/2/2016.
  */
 public class PlaceEntity {
 
-    private String place_id;
+    @SerializedName("place_id")
+    private String placeId;
 
+    @SerializedName("description")
     private String description;
 
     public PlaceEntity() {}
 
-    public String getPlace_id() {
-        return place_id;
+    public String getPlaceId() {
+        return placeId;
     }
 
-    public void setPlace_id(String place_id) {
-        this.place_id = place_id;
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
     }
 
     public String getDescription() {

@@ -1,5 +1,7 @@
 package com.tuyenmonkey.showmetheway.data.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 /**
@@ -7,15 +9,16 @@ import java.util.List;
  */
 public class PredictionEntity {
 
-    private List<PlaceEntity> predictions;
+    @SerializedName("predictions")
+    private List<PlaceEntity> placeEntityList;
 
     public PredictionEntity() {}
 
-    public List<PlaceEntity> getPredictions() {
-        return predictions;
+    public List<PlaceEntity> getPlaceEntityList() {
+        return placeEntityList;
     }
 
-    public void setPredictions(List<PlaceEntity> predictions) {
-        this.predictions = predictions;
+    public void setPlaceEntityList(List<PlaceEntity> placeEntityList) {
+        this.placeEntityList = placeEntityList;
     }
 }

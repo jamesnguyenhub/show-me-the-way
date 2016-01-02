@@ -16,8 +16,6 @@ public class ServiceFactory {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        T service = retrofit.create(serviceClass);
-
-        return service;
+        return retrofit.create(serviceClass);
     }
 }
