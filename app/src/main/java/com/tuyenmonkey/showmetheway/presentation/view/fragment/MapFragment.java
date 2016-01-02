@@ -6,6 +6,10 @@ import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -15,6 +19,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
+import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 
 import java.io.IOException;
 
@@ -31,6 +36,8 @@ public class MapFragment extends SupportMapFragment implements
 
     private static final String TAG = MapFragment.class.getSimpleName();
 
+    private GoogleApiClient googleApiClient;
+
     public static MapFragment newInstance() {
         return new MapFragment();
     }
@@ -38,6 +45,12 @@ public class MapFragment extends SupportMapFragment implements
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        googleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Places.GEO_DATA_API)
+                .build();
 
         this.initializeListeners();
         this.initializeCamera(10.75, 106.6667);
@@ -85,6 +98,36 @@ public class MapFragment extends SupportMapFragment implements
     public boolean onMarkerClick(Marker marker) {
         LogUtils.i(TAG, "onMarkerClick");
         return false;
+    }
+
+    public void findPlace(PlaceModel placeModel) {
+        if (googleApiClient.isConnected()) {
+            Places.GeoDataApi.getPlaceById(googleApiClient, placeModel.getPlaceId())
+                    .setResultCallback(new ResultCallback<PlaceBuffer>() {
+                        @Override
+                        public void onResult(PlaceBuffer places) {
+                            if (places.getStatus().isSuccess() && places.getCount() > 0) {
+                                final Place place = places.get(0);
+                                addMarker(place.getLatLng());
+                                LogUtils.d(TAG, "Place found: " + place.getName());
+                            } else {
+                                LogUtils.e(TAG, "Place not found");
+                            }
+                        }
+                    });
+        } else {
+            LogUtils.e(TAG, "googleApiClient is disconnected");
+        }
+    }
+
+    private void addMarker(LatLng latLng) {
+        MarkerOptions markerOptions = new MarkerOptions().position(latLng);
+        markerOptions.title(getAddressFromLatLng(latLng));
+        //markerOptions.icon(BitmapDescriptorFactory.fromBitmap(
+        //        BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker());
+
+        getMap().addMarker(markerOptions);
     }
 
     private void initializeListeners() {

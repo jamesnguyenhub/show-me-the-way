@@ -1,5 +1,6 @@
 package com.tuyenmonkey.showmetheway.presentation.view.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -53,9 +54,23 @@ public class SearchFragment extends BaseFragment implements
     private SearchPresenter searchPresenter;
     private PlacesAdapter placesAdapter;
     private boolean isStartingPointSearched;
+    private OnPlaceChosenListener onPlaceChosenListener;
+
+    public interface OnPlaceChosenListener {
+        void onPlaceChosen(PlaceModel placeModel, boolean isStartingPoint);
+    }
 
     public static SearchFragment newInstance() {
         return new SearchFragment();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof OnPlaceChosenListener) {
+            onPlaceChosenListener = (OnPlaceChosenListener)context;
+        }
     }
 
     @Nullable
@@ -120,6 +135,9 @@ public class SearchFragment extends BaseFragment implements
         LogUtils.v(TAG, "onPlaceItemClicked");
 
         this.searchPresenter.onPlaceItemClicked(placeModel, isStartingPointSearched);
+        if (onPlaceChosenListener != null) {
+            onPlaceChosenListener.onPlaceChosen(placeModel, isStartingPointSearched);
+        }
     }
 
     @OnClick(R.id.tv_starting_point)

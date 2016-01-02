@@ -2,6 +2,8 @@ package com.tuyenmonkey.showmetheway.helper;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -25,5 +27,22 @@ public class Utilities {
         display.getSize(size);
 
         return size;
+    }
+
+    /**
+     * Checks if the device has any active internet connection.
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isThereInternetConnection(Context context) {
+        boolean isConnected;
+
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        isConnected = (networkInfo != null && networkInfo.isConnectedOrConnecting());
+
+        return isConnected;
     }
 }
