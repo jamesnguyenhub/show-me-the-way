@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.tuyenmonkey.showmetheway.R;
+import com.tuyenmonkey.showmetheway.data.entity.PlaceEntity;
+import com.tuyenmonkey.showmetheway.data.entity.PredictionEntity;
 import com.tuyenmonkey.showmetheway.data.service.GooglePlacesService;
 import com.tuyenmonkey.showmetheway.data.service.ServiceFactory;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
@@ -86,7 +88,7 @@ public class SearchFragment extends BaseFragment {
         googlePlacesService.getPlaceList("cong hoa")
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
+                .subscribe(new Subscriber<PredictionEntity>() {
 
                     @Override
                     public void onCompleted() {
@@ -99,16 +101,16 @@ public class SearchFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onNext(String predictionEntity) {
-                        LogUtils.i(TAG, "onNext" + predictionEntity);
-                        /*if (predictionEntity != null) {
+                    public void onNext(PredictionEntity predictionEntity) {
+                        LogUtils.i(TAG, "onNext");
+                        if (predictionEntity != null) {
                             LogUtils.i(TAG, "!=null");
                             if (predictionEntity.getPredictions() != null) {
                                 for (PlaceEntity placeEntity : predictionEntity.getPredictions()) {
                                     LogUtils.d(TAG, placeEntity.getDescription());
                                 }
                             }
-                        }*/
+                        }
                     }
                 });
     }
@@ -130,7 +132,7 @@ public class SearchFragment extends BaseFragment {
         googlePlacesService.getPlaceList("cong hoa")
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
+                .subscribe(new Subscriber<PredictionEntity>() {
 
                     @Override
                     public void onCompleted() {
@@ -143,8 +145,8 @@ public class SearchFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onNext(String predictionEntity) {
-                        LogUtils.i(TAG, "onNext" + predictionEntity);
+                    public void onNext(PredictionEntity predictionEntity) {
+                        LogUtils.i(TAG, "onNext");
                         /*if (predictionEntity != null) {
                             LogUtils.i(TAG, "!=null");
                             if (predictionEntity.getPredictions() != null) {
