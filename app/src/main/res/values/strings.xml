@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Show me the way</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Keys -->
+    <string name="google_api_key">AIzaSyBLvaDAzdeOnn4fbg8BWeJdeQcVMMMLmmY</string>
+
+    <!-- Edittext hints -->
+    <string name="hint_starting_point">Starting point</string>
+    <string name="hint_destination">Destination</string>
+    <string name="hint_search">Search</string>
+
+    <!-- Errors -->
+    <string name="error_generic">There is an error</string>
+    <string name="error_network_connection">No network connection</string>
+</resources>
