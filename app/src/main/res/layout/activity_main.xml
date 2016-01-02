@@ -5,9 +5,8 @@
     android:layout_height="match_parent"
     >
 
-    <fragment
+    <FrameLayout
         android:id="@+id/fl_map_portion"
-        android:name="com.tuyenmonkey.showmetheway.presentation.view.fragment.MapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />

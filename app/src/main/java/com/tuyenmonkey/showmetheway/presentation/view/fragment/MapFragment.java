@@ -46,14 +46,28 @@ public class MapFragment extends SupportMapFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        googleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Places.GEO_DATA_API)
-                .build();
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(getActivity())
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(Places.GEO_DATA_API)
+                    .build();
+        }
 
         this.initializeListeners();
-        this.initializeCamera(10.75, 106.6667);
+        this.moveCamera(10.75, 106.6667);
+    }
+
+    @Override
+    public void onStart() {
+        googleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        googleApiClient.disconnect();
+        super.onStop();
     }
 
     @Override
@@ -101,7 +115,7 @@ public class MapFragment extends SupportMapFragment implements
     }
 
     public void findPlace(PlaceModel placeModel) {
-        if (googleApiClient.isConnected()) {
+        if (googleApiClient != null && googleApiClient.isConnected()) {
             Places.GeoDataApi.getPlaceById(googleApiClient, placeModel.getPlaceId())
                     .setResultCallback(new ResultCallback<PlaceBuffer>() {
                         @Override
@@ -109,10 +123,13 @@ public class MapFragment extends SupportMapFragment implements
                             if (places.getStatus().isSuccess() && places.getCount() > 0) {
                                 final Place place = places.get(0);
                                 addMarker(place.getLatLng());
+                                moveCamera(place.getLatLng().latitude, place.getLatLng().longitude);
                                 LogUtils.d(TAG, "Place found: " + place.getName());
                             } else {
                                 LogUtils.e(TAG, "Place not found");
                             }
+
+                            places.release();
                         }
                     });
         } else {
@@ -137,7 +154,7 @@ public class MapFragment extends SupportMapFragment implements
         getMap().setOnMapClickListener(this);
     }
 
-    private void initializeCamera(double latitude, double longitude) {
+    private void moveCamera(double latitude, double longitude) {
         CameraPosition cameraPosition = CameraPosition.builder()
                 .target(new LatLng(latitude, longitude))
                 .zoom(16f)

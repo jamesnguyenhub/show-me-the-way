@@ -29,7 +29,7 @@ public class MainActivity extends BaseActivity implements SearchFragment.OnPlace
             mapFragment = MapFragment.newInstance();
 
             addFragment(R.id.fl_search_portion, searchFragment);
-            //addFragment(R.id.fl_map_portion, mapFragment);
+            addFragment(R.id.fl_map_portion, mapFragment);
         }
     }
 
