@@ -10,15 +10,15 @@ import java.util.List;
 public class PredictionEntity {
 
     @SerializedName("predictions")
-    private List<PlaceEntity> placeEntityList;
+    private List<PlaceEntity> places;
 
     public PredictionEntity() {}
 
-    public List<PlaceEntity> getPlaceEntityList() {
-        return placeEntityList;
+    public List<PlaceEntity> getPlaces() {
+        return places;
     }
 
-    public void setPlaceEntityList(List<PlaceEntity> placeEntityList) {
-        this.placeEntityList = placeEntityList;
+    public void setPlaces(List<PlaceEntity> places) {
+        this.places = places;
     }
 }

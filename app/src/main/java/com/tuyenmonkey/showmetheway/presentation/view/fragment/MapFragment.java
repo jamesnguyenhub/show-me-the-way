@@ -1,6 +1,5 @@
 package com.tuyenmonkey.showmetheway.presentation.view.fragment;
 
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.View;
 
@@ -16,27 +15,27 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
 import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
-
-import java.io.IOException;
+import com.tuyenmonkey.showmetheway.presentation.presenter.MapPresenter;
+import com.tuyenmonkey.showmetheway.presentation.view.MapView;
 
 /**
  * Created by tuyen on 1/2/2016.
  */
 public class MapFragment extends SupportMapFragment implements
+        MapView,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnMapLongClickListener,
-        GoogleMap.OnMapClickListener,
-        GoogleMap.OnMarkerClickListener {
+        GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = MapFragment.class.getSimpleName();
 
+    private MapPresenter mapPresenter;
     private GoogleApiClient googleApiClient;
+    private GoogleMap googleMap;
+    private Place originPlace, destinationPlace;
 
     public static MapFragment newInstance() {
         return new MapFragment();
@@ -54,8 +53,7 @@ public class MapFragment extends SupportMapFragment implements
                     .build();
         }
 
-        this.initializeListeners();
-        this.moveCamera(10.75, 106.6667);
+        initialize();
     }
 
     @Override
@@ -85,36 +83,18 @@ public class MapFragment extends SupportMapFragment implements
         LogUtils.i(TAG, "onConnectionFailed");
     }
 
-    @Override
-    public void onInfoWindowClick(Marker marker) {
-        LogUtils.i(TAG, "onInfoWindowClick");
+    private void initialize() {
+        mapPresenter = new MapPresenter();
+        mapPresenter.setMapView(this);
+
+        googleMap = getMap();
+
+        this.moveCameraToLocation(10.75, 106.6667);
     }
 
-    @Override
-    public void onMapClick(LatLng latLng) {
-        LogUtils.i(TAG, "onMapClick");
+    public void findPlace(PlaceModel placeModel, final boolean isStartingPoint) {
+        LogUtils.i(TAG, "findPlace");
 
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng);
-        markerOptions.title(getAddressFromLatLng(latLng));
-        //markerOptions.icon(BitmapDescriptorFactory.fromBitmap(
-        //        BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker());
-
-        getMap().addMarker(markerOptions);
-    }
-
-    @Override
-    public void onMapLongClick(LatLng latLng) {
-        LogUtils.i(TAG, "onMapLongClick");
-    }
-
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        LogUtils.i(TAG, "onMarkerClick");
-        return false;
-    }
-
-    public void findPlace(PlaceModel placeModel) {
         if (googleApiClient != null && googleApiClient.isConnected()) {
             Places.GeoDataApi.getPlaceById(googleApiClient, placeModel.getPlaceId())
                     .setResultCallback(new ResultCallback<PlaceBuffer>() {
@@ -122,14 +102,35 @@ public class MapFragment extends SupportMapFragment implements
                         public void onResult(PlaceBuffer places) {
                             if (places.getStatus().isSuccess() && places.getCount() > 0) {
                                 final Place place = places.get(0);
-                                addMarker(place.getLatLng());
-                                moveCamera(place.getLatLng().latitude, place.getLatLng().longitude);
+
+                                if (isStartingPoint) {
+                                    originPlace = place;
+                                } else {
+                                    destinationPlace = place;
+                                }
+
+                                moveCameraToLocation(place.getLatLng().latitude,
+                                        place.getLatLng().longitude);
+
+                                googleMap.clear();
+
+                                if (originPlace != null) {
+                                    addMarker(originPlace.getLatLng(), 0);
+                                }
+
+                                if (destinationPlace != null) {
+                                    addMarker(destinationPlace.getLatLng(), 1);
+                                }
+
+                                if (originPlace != null && destinationPlace != null) {
+                                    drawDirection(originPlace.getLatLng(),
+                                            destinationPlace.getLatLng());
+                                }
+
                                 LogUtils.d(TAG, "Place found: " + place.getName());
                             } else {
                                 LogUtils.e(TAG, "Place not found");
                             }
-
-                            places.release();
                         }
                     });
         } else {
@@ -137,24 +138,23 @@ public class MapFragment extends SupportMapFragment implements
         }
     }
 
-    private void addMarker(LatLng latLng) {
-        MarkerOptions markerOptions = new MarkerOptions().position(latLng);
-        markerOptions.title(getAddressFromLatLng(latLng));
+    private void drawDirection(LatLng origin, LatLng destination) {
+        LogUtils.i(TAG, "drawDirection");
+        this.mapPresenter.testGetDirection(origin, destination);
+    }
+
+    private void addMarker(LatLng position, int markerIcon) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(position);
+        //markerOptions.title(address);
         //markerOptions.icon(BitmapDescriptorFactory.fromBitmap(
         //        BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher)));
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker());
 
-        getMap().addMarker(markerOptions);
+        googleMap.addMarker(markerOptions);
     }
 
-    private void initializeListeners() {
-        getMap().setOnMarkerClickListener(this);
-        getMap().setOnMapLongClickListener(this);
-        getMap().setOnInfoWindowClickListener( this );
-        getMap().setOnMapClickListener(this);
-    }
-
-    private void moveCamera(double latitude, double longitude) {
+    private void moveCameraToLocation(double latitude, double longitude) {
         CameraPosition cameraPosition = CameraPosition.builder()
                 .target(new LatLng(latitude, longitude))
                 .zoom(16f)
@@ -162,26 +162,11 @@ public class MapFragment extends SupportMapFragment implements
                 .tilt(0.0f)
                 .build();
 
-        getMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), null);
-        getMap().getUiSettings().setZoomControlsEnabled(true);
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), null);
     }
 
-    private String getAddressFromLatLng(LatLng latLng) {
-        Geocoder geocoder = new Geocoder(getActivity());
-
-        String address = "";
-        try {
-            address = geocoder
-                    .getFromLocation(latLng.latitude, latLng.longitude, 1)
-                    .get(0)
-                    .getAddressLine(0);
-
-            LogUtils.d(TAG, String.format("Address: %s", address));
-        } catch (IOException e) {
-            LogUtils.e(TAG, e.getMessage());
-            e.printStackTrace();
-        }
-
-        return address;
+    @Override
+    public void drawPath(PolylineOptions polylineOptions) {
+        googleMap.addPolyline(polylineOptions);
     }
 }

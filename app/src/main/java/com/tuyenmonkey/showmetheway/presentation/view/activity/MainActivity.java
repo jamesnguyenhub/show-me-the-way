@@ -36,6 +36,7 @@ public class MainActivity extends BaseActivity implements SearchFragment.OnPlace
     @Override
     public void onPlaceChosen(PlaceModel placeModel, boolean isStartingPoint) {
         LogUtils.i(TAG, "onPlaceChosen");
-        mapFragment.findPlace(placeModel);
+
+        mapFragment.findPlace(placeModel, isStartingPoint);
     }
 }

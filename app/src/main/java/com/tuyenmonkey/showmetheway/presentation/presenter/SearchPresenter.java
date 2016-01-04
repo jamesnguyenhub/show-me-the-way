@@ -1,7 +1,7 @@
 package com.tuyenmonkey.showmetheway.presentation.presenter;
 
 import com.tuyenmonkey.showmetheway.data.entity.PredictionEntity;
-import com.tuyenmonkey.showmetheway.data.service.GooglePlacesService;
+import com.tuyenmonkey.showmetheway.data.service.GoogleApiService;
 import com.tuyenmonkey.showmetheway.data.service.ServiceFactory;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
 import com.tuyenmonkey.showmetheway.presentation.mapper.PlaceModelDataMapper;
@@ -20,12 +20,12 @@ public class SearchPresenter implements Presenter {
     private static final String TAG = SearchPresenter.class.getSimpleName();
 
     private SearchView searchView;
-    private GooglePlacesService googlePlacesService;
+    private GoogleApiService googleApiService;
     private PlaceModelDataMapper placeModelDataMapper;
 
     public SearchPresenter() {
-        googlePlacesService = ServiceFactory.createRetrofitService(
-                GooglePlacesService.class, GooglePlacesService.BASE_URL);
+        googleApiService = ServiceFactory.createRetrofitService(
+                GoogleApiService.class, GoogleApiService.BASE_URL);
         placeModelDataMapper = new PlaceModelDataMapper();
     }
 
@@ -46,7 +46,7 @@ public class SearchPresenter implements Presenter {
     }
 
     public void loadPlaceList(String address) {
-        googlePlacesService.getPlaceList(address)
+        googleApiService.getPlaceList(address)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<PredictionEntity>() {
@@ -66,7 +66,7 @@ public class SearchPresenter implements Presenter {
                         if (predictionEntity != null) {
                             searchView.renderPlaceList(
                                     placeModelDataMapper.transform(
-                                            predictionEntity.getPlaceEntityList()));
+                                            predictionEntity.getPlaces()));
                         }
                     }
                 });

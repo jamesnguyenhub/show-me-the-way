@@ -66,6 +66,7 @@ public class SearchFragment extends BaseFragment implements
 
     @Override
     public void onAttach(Context context) {
+        LogUtils.i(TAG, "onCreateView");
         super.onAttach(context);
 
         if (context instanceof OnPlaceChosenListener) {
@@ -117,16 +118,19 @@ public class SearchFragment extends BaseFragment implements
             etSearch.setFocusable(false);
             etSearch.setFocusableInTouchMode(false);
             etSearch.setText("");
+            this.placesAdapter.setPlaceModelList(null);
         }
     }
 
     @Override
     public void setStartingText(String text) {
+        LogUtils.v(TAG, "setStartingText");
         tvStartingPoint.setText(text);
     }
 
     @Override
     public void setDestinationText(String text) {
+        LogUtils.v(TAG, "setDestinationText");
         tvDestination.setText(text);
     }
 
@@ -143,6 +147,7 @@ public class SearchFragment extends BaseFragment implements
     @OnClick(R.id.tv_starting_point)
     void onStartingPointTextViewClicked() {
         LogUtils.v(TAG, "onStartingPointTextViewClicked");
+
         isStartingPointSearched = true;
         toggleSearchPanel(true);
     }
@@ -150,6 +155,7 @@ public class SearchFragment extends BaseFragment implements
     @OnClick(R.id.tv_destination)
     void onDestinationTextViewClicked() {
         LogUtils.v(TAG, "onDestinationTextViewClicked");
+
         isStartingPointSearched = false;
         toggleSearchPanel(true);
     }
@@ -157,6 +163,7 @@ public class SearchFragment extends BaseFragment implements
     @OnTextChanged(R.id.et_search)
     void onSearchEditTextChanged() {
         LogUtils.v(TAG, "onSearchEditTextChanged");
+
         if (etSearch.getText().toString().length() > 3) {
             this.searchPresenter.loadPlaceList(etSearch.getText().toString());
         }
