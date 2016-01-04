@@ -8,7 +8,9 @@ import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 import com.tuyenmonkey.showmetheway.presentation.view.fragment.MapFragment;
 import com.tuyenmonkey.showmetheway.presentation.view.fragment.SearchFragment;
 
-public class MainActivity extends BaseActivity implements SearchFragment.OnPlaceChosenListener {
+public class MainActivity extends BaseActivity implements
+        SearchFragment.OnPlaceChosenListener,
+        MapFragment.OnAddressChangedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -23,13 +25,12 @@ public class MainActivity extends BaseActivity implements SearchFragment.OnPlace
         this.initializeActivity(savedInstanceState);
     }
 
-    private void initializeActivity(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            searchFragment = SearchFragment.newInstance();
-            mapFragment = MapFragment.newInstance();
-
-            addFragment(R.id.fl_search_portion, searchFragment);
-            addFragment(R.id.fl_map_portion, mapFragment);
+    @Override
+    public void onAddressChanged(String address, boolean isStartingPoint) {
+        if (isStartingPoint) {
+            searchFragment.setStartingText(address);
+        } else {
+            searchFragment.setDestinationText(address);
         }
     }
 
@@ -38,5 +39,15 @@ public class MainActivity extends BaseActivity implements SearchFragment.OnPlace
         LogUtils.i(TAG, "onPlaceChosen");
 
         mapFragment.findPlace(placeModel, isStartingPoint);
+    }
+
+    private void initializeActivity(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            searchFragment = SearchFragment.newInstance();
+            mapFragment = MapFragment.newInstance();
+
+            addFragment(R.id.fl_search_portion, searchFragment);
+            addFragment(R.id.fl_map_portion, mapFragment);
+        }
     }
 }
