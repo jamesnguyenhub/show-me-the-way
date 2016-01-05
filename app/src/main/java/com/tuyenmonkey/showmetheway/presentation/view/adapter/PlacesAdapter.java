@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tuyenmonkey.showmetheway.R;
+import com.tuyenmonkey.showmetheway.helper.Utilities;
 import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 
 import java.util.Collection;
@@ -44,8 +45,10 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final PlaceModel placeModel = placeModelList.get(position);
+        String[] address = Utilities.splitAddress(placeModel.getDescription());
 
-        holder.tvDescription.setText(placeModel.getDescription());
+        holder.tvAddress.setText(address[0]);
+        holder.tvExtraAddress.setText(address[1]);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,8 +77,11 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.tv_description)
-        TextView tvDescription;
+        @Bind(R.id.tv_address)
+        TextView tvAddress;
+
+        @Bind(R.id.tv_extra_address)
+        TextView tvExtraAddress;
 
         public ViewHolder(View itemView) {
             super(itemView);

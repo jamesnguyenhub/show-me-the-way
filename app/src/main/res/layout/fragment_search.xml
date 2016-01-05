@@ -9,25 +9,37 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_small"
         >
 
-        <TextView
-            android:id="@+id/tv_starting_point"
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:hint="@string/hint_starting_point"
-            android:background="@android:color/white"
-            />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_tiny"
+            >
 
-        <TextView
-            android:id="@+id/tv_destination"
+            <TextView
+                android:id="@+id/tv_starting_point"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_starting_point"
+                style="@style/PlaceTextView"
+                />
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:gravity="center_vertical"
-            android:hint="@string/hint_destination"
-            android:background="@android:color/white"
-            />
+            android:layout_height="wrap_content"
+            >
+
+            <TextView
+                android:id="@+id/tv_destination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_destination"
+                style="@style/PlaceTextView"
+                />
+        </android.support.v7.widget.CardView>
     </LinearLayout>
 
     <LinearLayout
@@ -35,22 +47,61 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
+        android:padding="@dimen/spacing_small"
+        android:background="@color/gray"
         >
 
-        <EditText
-            android:id="@+id/et_search"
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:hint="@string/hint_search"
-            android:focusable="false"
-            />
+            >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                >
+
+                <ImageView
+                    android:id="@+id/iv_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:padding="@dimen/spacing_tiny"
+                    android:src="@drawable/ic_action_back"
+                    />
+
+                <EditText
+                    android:id="@+id/et_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/iv_back"
+                    android:paddingTop="@dimen/spacing_small"
+                    android:paddingBottom="@dimen/spacing_small"
+                    android:inputType="text"
+                    android:focusable="false"
+                    android:hint="@string/hint_search"
+                    android:background="@drawable/edittext_custom"
+                    />
+
+                <ImageView
+                    android:id="@+id/iv_remove_search_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:padding="@dimen/spacing_tiny"
+                    android:src="@drawable/ic_action_remove"
+                    android:visibility="gone"
+                    />
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_places"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/spacing_small"
             />
     </LinearLayout>
 </FrameLayout>

@@ -73,6 +73,26 @@ public class Utilities {
     }
 
     /**
+     *
+     * @param description
+     * @return
+     */
+    public static String[] splitAddress(String description) {
+        String[] address = new String[2];
+
+        int splitIndex = description.indexOf(',');
+
+        if (splitIndex == -1) {
+            splitIndex = description.length();
+        }
+
+        address[0] = description.substring(0, splitIndex);
+        address[1] = description.substring(splitIndex + 1, description.length());
+
+        return address;
+    }
+
+    /**
      * Checks if the device has any active internet connection.
      *
      * @param context

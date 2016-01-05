@@ -8,7 +8,7 @@
     <!-- Edittext hints -->
     <string name="hint_starting_point">Starting point</string>
     <string name="hint_destination">Destination</string>
-    <string name="hint_search">Search</string>
+    <string name="hint_search">Search Google Maps</string>
 
     <!-- Errors -->
     <string name="error_generic">There is an error</string>

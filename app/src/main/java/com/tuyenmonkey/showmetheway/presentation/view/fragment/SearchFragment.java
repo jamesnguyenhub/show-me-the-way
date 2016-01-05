@@ -8,7 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -47,6 +49,12 @@ public class SearchFragment extends BaseFragment implements
 
     @Bind(R.id.et_search)
     EditText etSearch;
+
+    @Bind(R.id.iv_remove_search_text)
+    ImageView ivRemoveSearchText;
+
+    @Bind(R.id.iv_back)
+    ImageView ivBack;
 
     @Bind(R.id.rv_places)
     RecyclerView rvPlaces;
@@ -119,6 +127,16 @@ public class SearchFragment extends BaseFragment implements
             etSearch.setFocusableInTouchMode(false);
             etSearch.setText("");
             this.placesAdapter.setPlaceModelList(null);
+            hideSoftKey(etSearch);
+        }
+    }
+
+    @Override
+    public void toggleRemoveSearchTextImageView(boolean show) {
+        if (show) {
+            ivRemoveSearchText.setVisibility(View.VISIBLE);
+        } else {
+            ivRemoveSearchText.setVisibility(View.GONE);
         }
     }
 
@@ -132,6 +150,12 @@ public class SearchFragment extends BaseFragment implements
     public void setDestinationText(String text) {
         LogUtils.v(TAG, "setDestinationText");
         tvDestination.setText(text);
+    }
+
+    @Override
+    public void hideSoftKey(EditText editText) {
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
     }
 
     @Override
@@ -164,9 +188,25 @@ public class SearchFragment extends BaseFragment implements
     void onSearchEditTextChanged() {
         LogUtils.v(TAG, "onSearchEditTextChanged");
 
-        if (etSearch.getText().toString().length() > 3) {
-            this.searchPresenter.loadPlaceList(etSearch.getText().toString());
+        if (etSearch.getText().toString().length() > 0) {
+            toggleRemoveSearchTextImageView(true);
+
+            if (etSearch.getText().toString().length() > 3) {
+                this.searchPresenter.loadPlaceList(etSearch.getText().toString());
+            }
+        } else {
+            toggleRemoveSearchTextImageView(false);
         }
+    }
+
+    @OnClick(R.id.iv_remove_search_text)
+    void onRemoveSearchTextImageViewClicked() {
+        etSearch.setText("");
+    }
+
+    @OnClick(R.id.iv_back)
+    void onBackImageViewClicked() {
+        toggleSearchPanel(false);
     }
 
     private void initialize() {
