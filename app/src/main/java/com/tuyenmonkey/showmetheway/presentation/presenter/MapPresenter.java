@@ -71,8 +71,7 @@ public class MapPresenter implements Presenter {
                     public void onNext(DirectionEntity directionEntity) {
                         LogUtils.i(TAG, "onNext");
 
-                        List<List<LatLng>> routes = getRoutes(
-                                directionEntity.getRoutes());
+                        List<List<LatLng>> routes = getRoutes(directionEntity.getRoutes());
 
                         PolylineOptions lineOptions = getLineOptions(routes.get(0));
 
@@ -155,7 +154,7 @@ public class MapPresenter implements Presenter {
 
         lineOptions.addAll(route);
         lineOptions.width(5);
-        lineOptions.color(Color.BLUE);
+        lineOptions.color(Color.CYAN);
 
         return lineOptions;
     }

@@ -75,6 +75,4 @@ public class MainActivity extends BaseActivity implements
                 .netModule(new NetModule())
                 .build();
     }
-
-
 }
