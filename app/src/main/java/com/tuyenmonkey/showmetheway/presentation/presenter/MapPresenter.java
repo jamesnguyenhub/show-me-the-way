@@ -82,10 +82,7 @@ public class MapPresenter implements Presenter {
                 for (StepEntity stepEntity : legEntity.getSteps()) {
                     PolylineEntity polyline = stepEntity.getPolyline();
                     List<LatLng> positionList = Utilities.decodePolyline(polyline.getPoints());
-
-                    for (int i = 0; i < positionList.size(); i++) {
-                        path.add(positionList.get(i));
-                    }
+                    path.addAll(positionList);
                 }
 
                 routes.add(path);
