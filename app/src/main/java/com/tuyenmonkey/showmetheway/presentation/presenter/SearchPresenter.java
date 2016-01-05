@@ -33,8 +33,33 @@ public class SearchPresenter implements Presenter {
         this.searchView = searchView;
     }
 
-    public void onPlaceItemClicked(PlaceModel placeModel, boolean isStartingPointSearched) {
-        LogUtils.i(TAG, "onPlaceItemClicked");
+    public void toggleSearchPanel(boolean show) {
+        LogUtils.i(TAG, "toggleSearchPanel");
+
+        this.searchView.toggleSearchPanel(show);
+
+        if (show) {
+            this.searchView.setFocusableSearchEditText(true);
+        }
+    }
+
+    public void searchPlace(String address) {
+        LogUtils.i(TAG, "searchPlace");
+
+        if (address.length() > 0) {
+            this.searchView.toggleRemoveSearchTextImageView(true);
+
+            // Only request to search if text size > 3
+            if (address.length() > 3) {
+                this.loadPlaceList(address);
+            }
+        } else {
+            this.searchView.toggleRemoveSearchTextImageView(false);
+        }
+    }
+
+    public void selectPlace(PlaceModel placeModel, boolean isStartingPointSearched) {
+        LogUtils.i(TAG, "selectPlace");
 
         if (isStartingPointSearched) {
             this.searchView.setStartingText(placeModel.getDescription());
@@ -42,10 +67,12 @@ public class SearchPresenter implements Presenter {
             this.searchView.setDestinationText(placeModel.getDescription());
         }
 
-        this.searchView.toggleSearchPanel(false);
+        this.backToMapView();
     }
 
     public void loadPlaceList(String address) {
+        LogUtils.i(TAG, "loadPlaceList");
+
         googleApiService.getPlaceList(address)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -70,5 +97,20 @@ public class SearchPresenter implements Presenter {
                         }
                     }
                 });
+    }
+
+    public void backToMapView() {
+        LogUtils.i(TAG, "backToMapView");
+
+        this.searchView.toggleSearchPanel(false);
+        this.searchView.setFocusableSearchEditText(false);
+        this.searchView.hideSoftKey();
+        this.resetSearch();
+    }
+
+    public void resetSearch() {
+        LogUtils.i(TAG, "backToMapView");
+
+        this.searchView.resetSearch();
     }
 }

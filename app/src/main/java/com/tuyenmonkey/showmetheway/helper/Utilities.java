@@ -87,7 +87,7 @@ public class Utilities {
         }
 
         address[0] = description.substring(0, splitIndex);
-        address[1] = description.substring(splitIndex + 1, description.length());
+        address[1] = description.substring(splitIndex + 2, description.length());
 
         return address;
     }

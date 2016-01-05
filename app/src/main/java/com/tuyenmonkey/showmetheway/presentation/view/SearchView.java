@@ -1,7 +1,5 @@
 package com.tuyenmonkey.showmetheway.presentation.view;
 
-import android.widget.EditText;
-
 import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 
 import java.util.List;
@@ -11,10 +9,55 @@ import java.util.List;
  */
 public interface SearchView extends BaseView {
 
+    /**
+     * Show place list to view
+     *
+     * @param placeModelList
+     */
     void renderPlaceList(List<PlaceModel> placeModelList);
+
+    /**
+     * Show/hide the search panel
+     *
+     * @param show
+     */
     void toggleSearchPanel(boolean show);
+
+    /**
+     * Show/hide remove text button in search panel
+     *
+     * @param show
+     */
     void toggleRemoveSearchTextImageView(boolean show);
+
+    /**
+     * Set the origin place text
+     *
+     * @param text
+     */
     void setStartingText(String text);
+
+    /**
+     * Set the destination text
+     *
+     * @param text
+     */
     void setDestinationText(String text);
-    void hideSoftKey(EditText editText);
+
+    /**
+     * Hide soft keyboard when search panel closed
+     */
+    void hideSoftKey();
+
+    /**
+     * Set focusable to search place edittext
+     *
+     * @param focusable
+     */
+    void setFocusableSearchEditText(boolean focusable);
+
+    /**
+     *
+     */
+    void resetSearch();
 }

@@ -117,22 +117,17 @@ public class SearchFragment extends BaseFragment implements
             llSearchPanel.animate()
                     .translationY(0)
                     .withLayer();
-            etSearch.setFocusable(true);
-            etSearch.setFocusableInTouchMode(true);
         } else {
             llSearchPanel.animate()
                     .translationY(Utilities.getSystemWindowSize(getActivity()).y)
                     .withLayer();
-            etSearch.setFocusable(false);
-            etSearch.setFocusableInTouchMode(false);
-            etSearch.setText("");
-            this.placesAdapter.setPlaceModelList(null);
-            hideSoftKey(etSearch);
         }
     }
 
     @Override
     public void toggleRemoveSearchTextImageView(boolean show) {
+        LogUtils.i(TAG, "toggleRemoveSearchTextImageView");
+
         if (show) {
             ivRemoveSearchText.setVisibility(View.VISIBLE);
         } else {
@@ -142,27 +137,51 @@ public class SearchFragment extends BaseFragment implements
 
     @Override
     public void setStartingText(String text) {
-        LogUtils.v(TAG, "setStartingText");
+        LogUtils.i(TAG, "setStartingText");
+
         tvStartingPoint.setText(text);
     }
 
     @Override
     public void setDestinationText(String text) {
-        LogUtils.v(TAG, "setDestinationText");
+        LogUtils.i(TAG, "setDestinationText");
+
         tvDestination.setText(text);
     }
 
     @Override
-    public void hideSoftKey(EditText editText) {
+    public void hideSoftKey() {
+        LogUtils.i(TAG, "hideSoftKey");
+
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
+    }
+
+    @Override
+    public void setFocusableSearchEditText(boolean focusable) {
+        LogUtils.i(TAG, "setFocusableSearchEditText");
+
+        etSearch.setFocusable(focusable);
+        etSearch.setFocusableInTouchMode(focusable);
+
+        if (focusable) {
+            etSearch.requestFocus();
+        }
+    }
+
+    @Override
+    public void resetSearch() {
+        LogUtils.i(TAG, "resetSearch");
+
+        etSearch.setText("");
+        this.placesAdapter.setPlaceModelList(null);
     }
 
     @Override
     public void onPlaceItemClicked(PlaceModel placeModel) {
-        LogUtils.v(TAG, "onPlaceItemClicked");
+        LogUtils.v(TAG, "selectPlace");
 
-        this.searchPresenter.onPlaceItemClicked(placeModel, isStartingPointSearched);
+        this.searchPresenter.selectPlace(placeModel, isStartingPointSearched);
         if (onPlaceChosenListener != null) {
             onPlaceChosenListener.onPlaceChosen(placeModel, isStartingPointSearched);
         }
@@ -173,7 +192,7 @@ public class SearchFragment extends BaseFragment implements
         LogUtils.v(TAG, "onStartingPointTextViewClicked");
 
         isStartingPointSearched = true;
-        toggleSearchPanel(true);
+        this.searchPresenter.toggleSearchPanel(true);
     }
 
     @OnClick(R.id.tv_destination)
@@ -181,32 +200,28 @@ public class SearchFragment extends BaseFragment implements
         LogUtils.v(TAG, "onDestinationTextViewClicked");
 
         isStartingPointSearched = false;
-        toggleSearchPanel(true);
+        this.searchPresenter.toggleSearchPanel(true);
     }
 
     @OnTextChanged(R.id.et_search)
     void onSearchEditTextChanged() {
         LogUtils.v(TAG, "onSearchEditTextChanged");
 
-        if (etSearch.getText().toString().length() > 0) {
-            toggleRemoveSearchTextImageView(true);
-
-            if (etSearch.getText().toString().length() > 3) {
-                this.searchPresenter.loadPlaceList(etSearch.getText().toString());
-            }
-        } else {
-            toggleRemoveSearchTextImageView(false);
-        }
+        this.searchPresenter.searchPlace(etSearch.getText().toString());
     }
 
     @OnClick(R.id.iv_remove_search_text)
     void onRemoveSearchTextImageViewClicked() {
-        etSearch.setText("");
+        LogUtils.v(TAG, "onRemoveSearchTextImageViewClicked");
+
+        this.searchPresenter.resetSearch();
     }
 
     @OnClick(R.id.iv_back)
     void onBackImageViewClicked() {
-        toggleSearchPanel(false);
+        LogUtils.v(TAG, "onBackImageViewClicked");
+
+        this.searchPresenter.backToMapView();
     }
 
     private void initialize() {
@@ -218,6 +233,7 @@ public class SearchFragment extends BaseFragment implements
 
     private void setupUI() {
         LogUtils.i(TAG, "setupUI");
+
         // Hide search panel for the first time
         llSearchPanel.setTranslationY(Utilities.getSystemWindowSize(getActivity()).y);
 
