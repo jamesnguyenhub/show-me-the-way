@@ -2,6 +2,11 @@ package com.tuyenmonkey.showmetheway.presentation.presenter;
 
 import android.graphics.Color;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.tuyenmonkey.showmetheway.data.entity.DirectionEntity;
@@ -13,6 +18,7 @@ import com.tuyenmonkey.showmetheway.data.service.GoogleApiService;
 import com.tuyenmonkey.showmetheway.data.service.ServiceFactory;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
 import com.tuyenmonkey.showmetheway.helper.Utilities;
+import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 import com.tuyenmonkey.showmetheway.presentation.view.MapView;
 
 import java.util.ArrayList;
@@ -41,7 +47,7 @@ public class MapPresenter implements Presenter {
         this.mapView = mapView;
     }
 
-    public void showRoute(LatLng origin, LatLng destination) {
+    public void drawDirection(LatLng origin, LatLng destination) {
         googleApiService.getDirection(
                 String.format("%f,%f", origin.latitude, origin.longitude),
                 String.format("%f,%f", destination.latitude, destination.longitude))
@@ -70,6 +76,55 @@ public class MapPresenter implements Presenter {
                         mapView.drawPath(lineOptions);
                     }
                 });
+    }
+
+    public void findPlace(GoogleApiClient googleApiClient, PlaceModel placeModel,
+                          final boolean isStartingPoint) {
+        LogUtils.i(TAG, "findPlace");
+
+        Places.GeoDataApi.getPlaceById(googleApiClient, placeModel.getPlaceId())
+                .setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(PlaceBuffer places) {
+                        if (places.getStatus().isSuccess() && places.getCount() > 0) {
+                            final Place place = places.get(0);
+                            mapView.clearMap();
+
+                            if (isStartingPoint) {
+                                mapView.setOriginPosition(place.getLatLng());
+                            } else {
+                                mapView.setDestinationPosition(place.getLatLng());
+                            }
+
+                            moveCamera(place.getLatLng().latitude,
+                                    place.getLatLng().longitude);
+
+                            if (mapView.getOriginPosition() != null) {
+                                mapView.addMarker(mapView.getOriginPosition(), true);
+                            }
+
+                            if (mapView.getDestinationPosition() != null) {
+                                mapView.addMarker(mapView.getDestinationPosition(), false);
+                            }
+
+                            if (mapView.getOriginPosition() != null
+                                    && mapView.getDestinationPosition() != null) {
+                                drawDirection(mapView.getOriginPosition(),
+                                        mapView.getDestinationPosition());
+                            }
+
+                            LogUtils.d(TAG, "Place found: " + place.getName());
+                        } else {
+                            LogUtils.e(TAG, "Place not found");
+                        }
+
+                        places.release();
+                    }
+                });
+    }
+
+    public void moveCamera(double latitude, double longitude) {
+        this.mapView.moveCameraToLocation(latitude, longitude);
     }
 
     private List<List<LatLng>> getRoutes(List<RouteEntity> routeEntityList) {

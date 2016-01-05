@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity implements
     public void onPlaceChosen(PlaceModel placeModel, boolean isStartingPoint) {
         LogUtils.i(TAG, "onPlaceChosen");
 
-        mapFragment.findPlace(placeModel, isStartingPoint);
+        mapFragment.findPlaceOnMap(placeModel, isStartingPoint);
     }
 
     private void initializeActivity(Bundle savedInstanceState) {

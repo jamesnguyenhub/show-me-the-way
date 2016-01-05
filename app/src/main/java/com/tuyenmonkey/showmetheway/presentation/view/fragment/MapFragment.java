@@ -8,9 +8,6 @@ import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -113,7 +110,7 @@ public class MapFragment extends SupportMapFragment implements
 
     @Override
     public void onMarkerDragStart(Marker marker) {
-
+        LogUtils.v(TAG, "onMarkerDragStart");
     }
 
     @Override
@@ -121,7 +118,8 @@ public class MapFragment extends SupportMapFragment implements
         LogUtils.i(TAG, "onMarkerDrag");
 
         if (onAddressChangedListener != null) {
-            String address = getAddress(marker.getPosition().latitude, marker.getPosition().longitude);
+            String address = getAddress(marker.getPosition().latitude,
+                    marker.getPosition().longitude);
 
             if (marker.getTitle().equalsIgnoreCase("start")) {
                 originLatLng = marker.getPosition();
@@ -137,9 +135,9 @@ public class MapFragment extends SupportMapFragment implements
     public void onMarkerDragEnd(Marker marker) {
         if (originLatLng != null && destinationLatLng != null) {
             googleMap.clear();
-            drawDirection(originLatLng, destinationLatLng);
             addMarker(originLatLng, true);
             addMarker(destinationLatLng, false);
+            this.mapPresenter.drawDirection(originLatLng, destinationLatLng);
         }
     }
 
@@ -148,70 +146,24 @@ public class MapFragment extends SupportMapFragment implements
         googleMap.addPolyline(polylineOptions);
     }
 
-    private void initialize() {
-        mapPresenter = new MapPresenter();
-        mapPresenter.setMapView(this);
+    @Override
+    public void moveCameraToLocation(double latitude, double longitude) {
+        LogUtils.i(TAG, "moveCameraToLocation");
+        CameraPosition cameraPosition = CameraPosition.builder()
+                .target(new LatLng(latitude, longitude))
+                .zoom(16f)
+                .bearing(0.0f)
+                .tilt(0.0f)
+                .build();
 
-        googleMap = getMap();
-        googleMap.setOnMarkerDragListener(this);
-
-        this.moveCameraToLocation(10.75, 106.6667);
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), null);
     }
 
-    public void findPlace(PlaceModel placeModel, final boolean isStartingPoint) {
-        LogUtils.i(TAG, "findPlace");
-
-        if (googleApiClient != null && googleApiClient.isConnected()) {
-            Places.GeoDataApi.getPlaceById(googleApiClient, placeModel.getPlaceId())
-                    .setResultCallback(new ResultCallback<PlaceBuffer>() {
-                        @Override
-                        public void onResult(PlaceBuffer places) {
-                            if (places.getStatus().isSuccess() && places.getCount() > 0) {
-                                final Place place = places.get(0);
-                                googleMap.clear();
-
-                                if (isStartingPoint) {
-                                    originLatLng = place.getLatLng();
-                                } else {
-                                    destinationLatLng = place.getLatLng();
-                                }
-
-                                moveCameraToLocation(place.getLatLng().latitude,
-                                        place.getLatLng().longitude);
-
-                                if (originLatLng != null) {
-                                    addMarker(originLatLng, true);
-                                }
-
-                                if (destinationLatLng != null) {
-                                    addMarker(destinationLatLng, false);
-                                }
-
-                                if (originLatLng != null && destinationLatLng != null) {
-                                    drawDirection(originLatLng, destinationLatLng);
-                                }
-
-                                LogUtils.d(TAG, "Place found: " + place.getName());
-                            } else {
-                                LogUtils.e(TAG, "Place not found");
-                            }
-
-                            places.release();
-                        }
-                    });
-        } else {
-            LogUtils.e(TAG, "googleApiClient is disconnected");
-        }
-    }
-
-    private void drawDirection(LatLng origin, LatLng destination) {
-        LogUtils.i(TAG, "drawDirection");
-        this.mapPresenter.showRoute(origin, destination);
-    }
-
-    private void addMarker(LatLng position, boolean isStartingPoint) {
+    @Override
+    public void addMarker(LatLng position, boolean isStartingPoint) {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(position);
+        markerOptions.draggable(true);
 
         if (isStartingPoint) {
             markerOptions.title("start");
@@ -223,20 +175,54 @@ public class MapFragment extends SupportMapFragment implements
                     .defaultMarker(BitmapDescriptorFactory.HUE_RED));
         }
 
-        markerOptions.draggable(true);
-
         googleMap.addMarker(markerOptions);
     }
 
-    private void moveCameraToLocation(double latitude, double longitude) {
-        CameraPosition cameraPosition = CameraPosition.builder()
-                .target(new LatLng(latitude, longitude))
-                .zoom(16f)
-                .bearing(0.0f)
-                .tilt(0.0f)
-                .build();
+    @Override
+    public void clearMap() {
+        googleMap.clear();
+    }
 
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), null);
+    @Override
+    public void setOriginPosition(LatLng latLng) {
+        originLatLng = latLng;
+    }
+
+    @Override
+    public LatLng getOriginPosition() {
+        return originLatLng;
+    }
+
+    @Override
+    public void setDestinationPosition(LatLng latLng) {
+        destinationLatLng = latLng;
+    }
+
+    @Override
+    public LatLng getDestinationPosition() {
+        return destinationLatLng;
+    }
+
+    private void initialize() {
+        mapPresenter = new MapPresenter();
+        mapPresenter.setMapView(this);
+
+        googleMap = getMap();
+        googleMap.setOnMarkerDragListener(this);
+        
+        if (originLatLng == null && destinationLatLng == null) {
+            this.mapPresenter.moveCamera(10.75, 106.6667);
+        }
+    }
+
+    public void findPlaceOnMap(PlaceModel placeModel, final boolean isStartingPoint) {
+        LogUtils.i(TAG, "findPlaceOnMap");
+
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            this.mapPresenter.findPlace(googleApiClient, placeModel, isStartingPoint);
+        } else {
+            LogUtils.e(TAG, "googleApiClient is disconnected");
+        }
     }
 
     private String getAddress(double latitude, double longitude) {
@@ -247,6 +233,7 @@ public class MapFragment extends SupportMapFragment implements
 
         try {
             List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            
             if (addresses != null) {
                 Address returnedAddress = addresses.get(0);
                 StringBuilder strReturnedAddress = new StringBuilder("");
@@ -259,7 +246,6 @@ public class MapFragment extends SupportMapFragment implements
                 }
 
                 addressString = strReturnedAddress.toString();
-                LogUtils.d(TAG, "" + strReturnedAddress.toString());
             } else {
                 LogUtils.d(TAG, "No Address returned");
             }
