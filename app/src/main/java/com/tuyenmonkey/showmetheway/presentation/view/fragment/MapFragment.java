@@ -206,7 +206,7 @@ public class MapFragment extends SupportMapFragment implements
 
     private void drawDirection(LatLng origin, LatLng destination) {
         LogUtils.i(TAG, "drawDirection");
-        this.mapPresenter.testGetDirection(origin, destination);
+        this.mapPresenter.showRoute(origin, destination);
     }
 
     private void addMarker(LatLng position, boolean isStartingPoint) {

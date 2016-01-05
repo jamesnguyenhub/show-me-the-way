@@ -42,7 +42,7 @@ public class MapPresenter implements Presenter {
         this.mapView = mapView;
     }
 
-    public void testGetDirection(LatLng origin, LatLng destination) {
+    public void showRoute(LatLng origin, LatLng destination) {
         googleApiService.getDirection(
                 String.format("%f,%f", origin.latitude, origin.longitude),
                 String.format("%f,%f", destination.latitude, destination.longitude))
@@ -62,7 +62,7 @@ public class MapPresenter implements Presenter {
                     @Override
                     public void onNext(DirectionEntity directionEntity) {
                         LogUtils.i(TAG, "onNext");
-                        List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String,String>>>() ;
+                        List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String, String>>>();
 
                         if (directionEntity != null && directionEntity.getRoutes() != null) {
                             for (RouteEntity routeEntity : directionEntity.getRoutes()) {
@@ -74,10 +74,10 @@ public class MapPresenter implements Presenter {
 
                                         List<LatLng> positionList = Utilities.decodePolyline(polyline.getPoints());
 
-                                        for(int l=0;l<positionList.size();l++){
+                                        for (int l = 0; l < positionList.size(); l++) {
                                             HashMap<String, String> hm = new HashMap<String, String>();
-                                            hm.put("lat", Double.toString(((LatLng)positionList.get(l)).latitude) );
-                                            hm.put("lng", Double.toString(((LatLng)positionList.get(l)).longitude) );
+                                            hm.put("lat", Double.toString(((LatLng) positionList.get(l)).latitude));
+                                            hm.put("lng", Double.toString(((LatLng) positionList.get(l)).longitude));
                                             path.add(hm);
                                         }
                                     }
@@ -90,17 +90,14 @@ public class MapPresenter implements Presenter {
                         ArrayList<LatLng> points = null;
                         PolylineOptions lineOptions = null;
 
-                        // Traversing through all the routes
-                        for(int i=0;i<routes.size();i++){
+                        for (int i = 0; i < routes.size(); i++) {
                             points = new ArrayList<LatLng>();
                             lineOptions = new PolylineOptions();
 
-                            // Fetching i-th route
                             List<HashMap<String, String>> path = routes.get(i);
 
-                            // Fetching all the points in i-th route
-                            for(int j=0;j<path.size();j++){
-                                HashMap<String,String> point = path.get(j);
+                            for (int j = 0; j < path.size(); j++) {
+                                HashMap<String, String> point = path.get(j);
 
                                 double lat = Double.parseDouble(point.get("lat"));
                                 double lng = Double.parseDouble(point.get("lng"));
@@ -109,13 +106,11 @@ public class MapPresenter implements Presenter {
                                 points.add(position);
                             }
 
-                            // Adding all the points in the route to LineOptions
                             lineOptions.addAll(points);
                             lineOptions.width(5);
                             lineOptions.color(Color.BLUE);
                         }
 
-                        // Drawing polyline in the Google Map for the i-th route
                         mapView.drawPath(lineOptions);
                     }
                 });
