@@ -16,7 +16,6 @@ import com.tuyenmonkey.showmetheway.helper.Utilities;
 import com.tuyenmonkey.showmetheway.presentation.view.MapView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import rx.Subscriber;
@@ -63,7 +62,7 @@ public class MapPresenter implements Presenter {
                     public void onNext(DirectionEntity directionEntity) {
                         LogUtils.i(TAG, "onNext");
 
-                        List<List<HashMap<String, Double>>> routes = getRoutes(
+                        List<List<LatLng>> routes = getRoutes(
                                 directionEntity.getRoutes());
 
                         PolylineOptions lineOptions = getLineOptions(routes);
@@ -73,11 +72,11 @@ public class MapPresenter implements Presenter {
                 });
     }
 
-    private List<List<HashMap<String, Double>>> getRoutes(List<RouteEntity> routeEntityList) {
-        List<List<HashMap<String, Double>>> routes = new ArrayList<>();
+    private List<List<LatLng>> getRoutes(List<RouteEntity> routeEntityList) {
+        List<List<LatLng>> routes = new ArrayList<>();
 
         for (RouteEntity routeEntity : routeEntityList) {
-            List<HashMap<String, Double>> path = new ArrayList<>();
+            List<LatLng> path = new ArrayList<>();
 
             for (LegEntity legEntity : routeEntity.getLegs()) {
                 for (StepEntity stepEntity : legEntity.getSteps()) {
@@ -85,10 +84,7 @@ public class MapPresenter implements Presenter {
                     List<LatLng> positionList = Utilities.decodePolyline(polyline.getPoints());
 
                     for (int i = 0; i < positionList.size(); i++) {
-                        HashMap<String, Double> temp = new HashMap<>();
-                        temp.put("lat", positionList.get(i).latitude);
-                        temp.put("lng", positionList.get(i).longitude);
-                        path.add(temp);
+                        path.add(positionList.get(i));
                     }
                 }
 
@@ -99,7 +95,7 @@ public class MapPresenter implements Presenter {
         return routes;
     }
 
-    private PolylineOptions getLineOptions(List<List<HashMap<String, Double>>> routes) {
+    private PolylineOptions getLineOptions(List<List<LatLng>> routes) {
         ArrayList<LatLng> points = null;
         PolylineOptions lineOptions = null;
 
@@ -107,16 +103,12 @@ public class MapPresenter implements Presenter {
             points = new ArrayList<>();
             lineOptions = new PolylineOptions();
 
-            List<HashMap<String, Double>> path = routes.get(i);
+            List<LatLng> path = routes.get(i);
 
             for (int j = 0; j < path.size(); j++) {
-                HashMap<String, Double> point = path.get(j);
+                LatLng point = path.get(j);
 
-                double lat = point.get("lat");
-                double lng = point.get("lng");
-                LatLng position = new LatLng(lat, lng);
-
-                points.add(position);
+                points.add(point);
             }
 
             lineOptions.addAll(points);
