@@ -1,3 +1,3 @@
 # Show Me The Way
 
-![alt tag](http://i.imgur.com/5kDm4qf.png?1)
+![alt tag](http://i.imgur.com/hg3G1BK.png)
