@@ -19,12 +19,16 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
+import com.tuyenmonkey.showmetheway.presentation.di.HasComponent;
+import com.tuyenmonkey.showmetheway.presentation.di.component.NetComponent;
 import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 import com.tuyenmonkey.showmetheway.presentation.presenter.MapPresenter;
 import com.tuyenmonkey.showmetheway.presentation.view.MapView;
 
 import java.util.List;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 /**
  * Created by tuyen on 1/2/2016.
@@ -37,7 +41,9 @@ public class MapFragment extends SupportMapFragment implements
 
     private static final String TAG = MapFragment.class.getSimpleName();
 
-    private MapPresenter mapPresenter;
+    @Inject
+    MapPresenter mapPresenter;
+
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
     private LatLng originLatLng, destinationLatLng;
@@ -204,7 +210,7 @@ public class MapFragment extends SupportMapFragment implements
     }
 
     private void initialize() {
-        mapPresenter = new MapPresenter();
+        this.getComponent(NetComponent.class).inject(this);
         mapPresenter.setMapView(this);
 
         googleMap = getMap();
@@ -255,5 +261,10 @@ public class MapFragment extends SupportMapFragment implements
         }
 
         return addressString;
+    }
+
+    @SuppressWarnings("unchecked")
+    private  <C> C getComponent(Class<C> componentType) {
+        return componentType.cast(((HasComponent<C>)getActivity()).getComponent());
     }
 }

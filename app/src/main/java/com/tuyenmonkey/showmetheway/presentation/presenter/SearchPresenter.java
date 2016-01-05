@@ -2,11 +2,13 @@ package com.tuyenmonkey.showmetheway.presentation.presenter;
 
 import com.tuyenmonkey.showmetheway.data.entity.PredictionEntity;
 import com.tuyenmonkey.showmetheway.data.service.GoogleApiService;
-import com.tuyenmonkey.showmetheway.data.service.ServiceFactory;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
+import com.tuyenmonkey.showmetheway.presentation.di.PerActivity;
 import com.tuyenmonkey.showmetheway.presentation.mapper.PlaceModelDataMapper;
 import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 import com.tuyenmonkey.showmetheway.presentation.view.SearchView;
+
+import javax.inject.Inject;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -15,6 +17,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by tuyen on 1/2/2016.
  */
+@PerActivity
 public class SearchPresenter implements Presenter {
 
     private static final String TAG = SearchPresenter.class.getSimpleName();
@@ -23,10 +26,11 @@ public class SearchPresenter implements Presenter {
     private GoogleApiService googleApiService;
     private PlaceModelDataMapper placeModelDataMapper;
 
-    public SearchPresenter() {
-        googleApiService = ServiceFactory.createRetrofitService(
-                GoogleApiService.class, GoogleApiService.BASE_URL);
-        placeModelDataMapper = new PlaceModelDataMapper();
+    @Inject
+    public SearchPresenter(GoogleApiService googleApiService,
+                           PlaceModelDataMapper placeModelDataMapper) {
+        this.googleApiService = googleApiService;
+        this.placeModelDataMapper = placeModelDataMapper;
     }
 
     public void setSearchView(SearchView searchView) {

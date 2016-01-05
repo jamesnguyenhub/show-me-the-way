@@ -1,17 +1,22 @@
 package com.tuyenmonkey.showmetheway.presentation.mapper;
 
 import com.tuyenmonkey.showmetheway.data.entity.PlaceEntity;
+import com.tuyenmonkey.showmetheway.presentation.di.PerActivity;
 import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by tuyen on 1/2/2016.
  */
+@PerActivity
 public class PlaceModelDataMapper {
 
+    @Inject
     public PlaceModelDataMapper() {}
 
     public PlaceModel transform(PlaceEntity placeEntity) {

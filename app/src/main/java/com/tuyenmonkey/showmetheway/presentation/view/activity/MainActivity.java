@@ -4,18 +4,24 @@ import android.os.Bundle;
 
 import com.tuyenmonkey.showmetheway.R;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
+import com.tuyenmonkey.showmetheway.presentation.di.HasComponent;
+import com.tuyenmonkey.showmetheway.presentation.di.component.DaggerNetComponent;
+import com.tuyenmonkey.showmetheway.presentation.di.component.NetComponent;
+import com.tuyenmonkey.showmetheway.presentation.di.module.NetModule;
 import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 import com.tuyenmonkey.showmetheway.presentation.view.fragment.MapFragment;
 import com.tuyenmonkey.showmetheway.presentation.view.fragment.SearchFragment;
 
 public class MainActivity extends BaseActivity implements
         SearchFragment.OnPlaceChosenListener,
-        MapFragment.OnAddressChangedListener {
+        MapFragment.OnAddressChangedListener,
+        HasComponent<NetComponent> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private SearchFragment searchFragment;
     private MapFragment mapFragment;
+    private NetComponent netComponent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +29,7 @@ public class MainActivity extends BaseActivity implements
         setContentView(R.layout.activity_main);
 
         this.initializeActivity(savedInstanceState);
+        this.initializeInjector();
     }
 
     @Override
@@ -32,6 +39,11 @@ public class MainActivity extends BaseActivity implements
         } else {
             searchFragment.setDestinationText(address);
         }
+    }
+
+    @Override
+    public NetComponent getComponent() {
+        return netComponent;
     }
 
     @Override
@@ -55,4 +67,14 @@ public class MainActivity extends BaseActivity implements
                     .findFragmentById(R.id.fl_map_portion);
         }
     }
+
+    private void initializeInjector() {
+        this.netComponent = DaggerNetComponent.builder()
+                .appComponent(getApplicationComponent())
+                .activityModule(getActivityModule())
+                .netModule(new NetModule())
+                .build();
+    }
+
+
 }

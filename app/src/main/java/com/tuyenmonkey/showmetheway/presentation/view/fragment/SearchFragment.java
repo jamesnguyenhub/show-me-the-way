@@ -17,12 +17,15 @@ import android.widget.TextView;
 import com.tuyenmonkey.showmetheway.R;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
 import com.tuyenmonkey.showmetheway.helper.Utilities;
+import com.tuyenmonkey.showmetheway.presentation.di.component.NetComponent;
 import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 import com.tuyenmonkey.showmetheway.presentation.presenter.SearchPresenter;
 import com.tuyenmonkey.showmetheway.presentation.view.SearchView;
 import com.tuyenmonkey.showmetheway.presentation.view.adapter.PlacesAdapter;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -59,7 +62,9 @@ public class SearchFragment extends BaseFragment implements
     @Bind(R.id.rv_places)
     RecyclerView rvPlaces;
 
-    private SearchPresenter searchPresenter;
+    @Inject
+    SearchPresenter searchPresenter;
+
     private PlacesAdapter placesAdapter;
     private boolean isStartingPointSearched;
     private OnPlaceChosenListener onPlaceChosenListener;
@@ -227,7 +232,7 @@ public class SearchFragment extends BaseFragment implements
     private void initialize() {
         LogUtils.i(TAG, "initialize");
 
-        this.searchPresenter = new SearchPresenter();
+        this.getComponent(NetComponent.class).inject(this);
         this.searchPresenter.setSearchView(this);
     }
 

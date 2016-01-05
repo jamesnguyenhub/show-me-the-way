@@ -15,14 +15,16 @@ import com.tuyenmonkey.showmetheway.data.entity.PolylineEntity;
 import com.tuyenmonkey.showmetheway.data.entity.RouteEntity;
 import com.tuyenmonkey.showmetheway.data.entity.StepEntity;
 import com.tuyenmonkey.showmetheway.data.service.GoogleApiService;
-import com.tuyenmonkey.showmetheway.data.service.ServiceFactory;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
 import com.tuyenmonkey.showmetheway.helper.Utilities;
+import com.tuyenmonkey.showmetheway.presentation.di.PerActivity;
 import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
 import com.tuyenmonkey.showmetheway.presentation.view.MapView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -31,6 +33,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by tuyen on 1/4/2016.
  */
+@PerActivity
 public class MapPresenter implements Presenter {
 
     private static final String TAG = MapPresenter.class.getSimpleName();
@@ -38,9 +41,9 @@ public class MapPresenter implements Presenter {
     private MapView mapView;
     private GoogleApiService googleApiService;
 
-    public MapPresenter() {
-        googleApiService = ServiceFactory.createRetrofitService(
-                GoogleApiService.class, GoogleApiService.BASE_URL);
+    @Inject
+    public MapPresenter(GoogleApiService googleApiService) {
+        this.googleApiService = googleApiService;
     }
 
     public void setMapView(MapView mapView) {
