@@ -62,57 +62,68 @@ public class MapPresenter implements Presenter {
                     @Override
                     public void onNext(DirectionEntity directionEntity) {
                         LogUtils.i(TAG, "onNext");
-                        List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String, String>>>();
 
-                        if (directionEntity != null && directionEntity.getRoutes() != null) {
-                            for (RouteEntity routeEntity : directionEntity.getRoutes()) {
-                                List path = new ArrayList<HashMap<String, String>>();
+                        List<List<HashMap<String, Double>>> routes = getRoutes(
+                                directionEntity.getRoutes());
 
-                                for (LegEntity legEntity : routeEntity.getLegs()) {
-                                    for (StepEntity stepEntity : legEntity.getSteps()) {
-                                        PolylineEntity polyline = stepEntity.getPolyline();
-
-                                        List<LatLng> positionList = Utilities.decodePolyline(polyline.getPoints());
-
-                                        for (int l = 0; l < positionList.size(); l++) {
-                                            HashMap<String, String> hm = new HashMap<String, String>();
-                                            hm.put("lat", Double.toString(((LatLng) positionList.get(l)).latitude));
-                                            hm.put("lng", Double.toString(((LatLng) positionList.get(l)).longitude));
-                                            path.add(hm);
-                                        }
-                                    }
-
-                                    routes.add(path);
-                                }
-                            }
-                        }
-
-                        ArrayList<LatLng> points = null;
-                        PolylineOptions lineOptions = null;
-
-                        for (int i = 0; i < routes.size(); i++) {
-                            points = new ArrayList<LatLng>();
-                            lineOptions = new PolylineOptions();
-
-                            List<HashMap<String, String>> path = routes.get(i);
-
-                            for (int j = 0; j < path.size(); j++) {
-                                HashMap<String, String> point = path.get(j);
-
-                                double lat = Double.parseDouble(point.get("lat"));
-                                double lng = Double.parseDouble(point.get("lng"));
-                                LatLng position = new LatLng(lat, lng);
-
-                                points.add(position);
-                            }
-
-                            lineOptions.addAll(points);
-                            lineOptions.width(5);
-                            lineOptions.color(Color.BLUE);
-                        }
+                        PolylineOptions lineOptions = getLineOptions(routes);
 
                         mapView.drawPath(lineOptions);
                     }
                 });
+    }
+
+    private List<List<HashMap<String, Double>>> getRoutes(List<RouteEntity> routeEntityList) {
+        List<List<HashMap<String, Double>>> routes = new ArrayList<>();
+
+        for (RouteEntity routeEntity : routeEntityList) {
+            List<HashMap<String, Double>> path = new ArrayList<>();
+
+            for (LegEntity legEntity : routeEntity.getLegs()) {
+                for (StepEntity stepEntity : legEntity.getSteps()) {
+                    PolylineEntity polyline = stepEntity.getPolyline();
+                    List<LatLng> positionList = Utilities.decodePolyline(polyline.getPoints());
+
+                    for (int i = 0; i < positionList.size(); i++) {
+                        HashMap<String, Double> temp = new HashMap<>();
+                        temp.put("lat", positionList.get(i).latitude);
+                        temp.put("lng", positionList.get(i).longitude);
+                        path.add(temp);
+                    }
+                }
+
+                routes.add(path);
+            }
+        }
+
+        return routes;
+    }
+
+    private PolylineOptions getLineOptions(List<List<HashMap<String, Double>>> routes) {
+        ArrayList<LatLng> points = null;
+        PolylineOptions lineOptions = null;
+
+        for (int i = 0; i < routes.size(); i++) {
+            points = new ArrayList<>();
+            lineOptions = new PolylineOptions();
+
+            List<HashMap<String, Double>> path = routes.get(i);
+
+            for (int j = 0; j < path.size(); j++) {
+                HashMap<String, Double> point = path.get(j);
+
+                double lat = point.get("lat");
+                double lng = point.get("lng");
+                LatLng position = new LatLng(lat, lng);
+
+                points.add(position);
+            }
+
+            lineOptions.addAll(points);
+            lineOptions.width(5);
+            lineOptions.color(Color.BLUE);
+        }
+
+        return lineOptions;
     }
 }
