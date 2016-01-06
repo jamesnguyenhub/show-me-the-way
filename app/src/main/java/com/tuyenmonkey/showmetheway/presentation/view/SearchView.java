@@ -45,9 +45,9 @@ public interface SearchView extends BaseView {
     void setDestinationText(String text);
 
     /**
-     * Hide soft keyboard when search panel closed
+     * Toggle soft keyboard when search panel closed
      */
-    void hideSoftKey();
+    void toggleSoftKey(boolean show);
 
     /**
      * Set focusable to search place edittext
@@ -60,4 +60,8 @@ public interface SearchView extends BaseView {
      *
      */
     void resetSearch();
+
+    void showError();
+
+    void hideError();
 }

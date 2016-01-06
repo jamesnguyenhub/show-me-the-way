@@ -62,6 +62,9 @@ public class SearchFragment extends BaseFragment implements
     @Bind(R.id.rv_places)
     RecyclerView rvPlaces;
 
+    @Bind(R.id.tv_error)
+    TextView tvError;
+
     @Inject
     SearchPresenter searchPresenter;
 
@@ -155,11 +158,16 @@ public class SearchFragment extends BaseFragment implements
     }
 
     @Override
-    public void hideSoftKey() {
-        LogUtils.i(TAG, "hideSoftKey");
+    public void toggleSoftKey(boolean show) {
+        LogUtils.i(TAG, "toggleSoftKey");
 
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
+
+        if (show) {
+            imm.showSoftInput(etSearch, 0);
+        } else {
+            imm.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
+        }
     }
 
     @Override
@@ -180,6 +188,20 @@ public class SearchFragment extends BaseFragment implements
 
         etSearch.setText("");
         this.placesAdapter.setPlaceModelList(null);
+    }
+
+    @Override
+    public void showError() {
+        if (tvError.getVisibility() == View.GONE) {
+            tvError.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void hideError() {
+        if (tvError.getVisibility() == View.VISIBLE) {
+            tvError.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -234,6 +256,7 @@ public class SearchFragment extends BaseFragment implements
 
         this.getComponent(NetComponent.class).inject(this);
         this.searchPresenter.setSearchView(this);
+        this.searchPresenter.setContext(getActivity());
     }
 
     private void setupUI() {

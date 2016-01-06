@@ -104,7 +104,7 @@ public class Utilities {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        isConnected = (networkInfo != null && networkInfo.isConnectedOrConnecting());
+        isConnected = (networkInfo != null && networkInfo.isConnected());
 
         return isConnected;
     }

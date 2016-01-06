@@ -97,6 +97,16 @@
             </RelativeLayout>
         </android.support.v7.widget.CardView>
 
+        <TextView
+            android:id="@+id/tv_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:gravity="center_horizontal"
+            android:text="@string/error_network_connection"
+            android:visibility="gone"
+            />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_places"
             android:layout_width="match_parent"

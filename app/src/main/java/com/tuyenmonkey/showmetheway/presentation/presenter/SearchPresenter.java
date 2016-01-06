@@ -1,8 +1,11 @@
 package com.tuyenmonkey.showmetheway.presentation.presenter;
 
+import android.content.Context;
+
 import com.tuyenmonkey.showmetheway.data.entity.PredictionEntity;
 import com.tuyenmonkey.showmetheway.data.service.GoogleApiService;
 import com.tuyenmonkey.showmetheway.helper.LogUtils;
+import com.tuyenmonkey.showmetheway.helper.Utilities;
 import com.tuyenmonkey.showmetheway.presentation.di.PerActivity;
 import com.tuyenmonkey.showmetheway.presentation.mapper.PlaceModelDataMapper;
 import com.tuyenmonkey.showmetheway.presentation.model.PlaceModel;
@@ -23,6 +26,7 @@ public class SearchPresenter implements Presenter {
     private static final String TAG = SearchPresenter.class.getSimpleName();
 
     private SearchView searchView;
+    private Context context;
     private GoogleApiService googleApiService;
     private PlaceModelDataMapper placeModelDataMapper;
 
@@ -37,6 +41,10 @@ public class SearchPresenter implements Presenter {
         this.searchView = searchView;
     }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     public void toggleSearchPanel(boolean show) {
         LogUtils.i(TAG, "toggleSearchPanel");
 
@@ -44,11 +52,19 @@ public class SearchPresenter implements Presenter {
 
         if (show) {
             this.searchView.setFocusableSearchEditText(true);
+            this.searchView.toggleSoftKey(true);
         }
     }
 
     public void searchPlace(String address) {
         LogUtils.i(TAG, "searchPlace");
+
+        if (Utilities.isThereInternetConnection(context)) {
+            searchView.hideError();
+        } else {
+            searchView.showError();
+            return;
+        }
 
         if (address.length() > 0) {
             this.searchView.toggleRemoveSearchTextImageView(true);
@@ -108,7 +124,7 @@ public class SearchPresenter implements Presenter {
 
         this.searchView.toggleSearchPanel(false);
         this.searchView.setFocusableSearchEditText(false);
-        this.searchView.hideSoftKey();
+        this.searchView.toggleSoftKey(false);
         this.resetSearch();
     }
 
